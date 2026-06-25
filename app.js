@@ -1,180 +1,320 @@
 const agents = [
   {
+    id: "product",
     name: "Product Agent",
     focus: "user value",
     color: "blue",
-    prompt:
-      "Pressure-test the goal for real user value. Ask who needs it, what pain it removes, and what the first useful moment is.",
+    mandate: "Define the smallest useful product moment and cut vanity.",
   },
   {
+    id: "builder",
     name: "Builder Agent",
     focus: "ship path",
     color: "green",
-    prompt:
-      "Reduce the idea to the smallest working artifact. Name files, implementation steps, and anything to cut.",
+    mandate: "Turn the idea into files, steps, acceptance tests, and a build order.",
   },
   {
+    id: "skeptic",
     name: "Skeptic Agent",
-    focus: "failure modes",
+    focus: "scope risk",
     color: "yellow",
-    prompt:
-      "Attack the plan. Identify hidden dependencies, fake claims, demo risks, and places where the scope is too big.",
+    mandate: "Attack hidden dependencies, fake claims, and demo fragility.",
   },
   {
+    id: "judge",
     name: "Judge Agent",
-    focus: "demo clarity",
+    focus: "submission clarity",
     color: "red",
-    prompt:
-      "Evaluate whether the final output can be understood quickly from submitted materials, with no login or private context.",
+    mandate: "Check whether the artifact is public, legible, honest, and Codex-relevant.",
   },
 ];
 
-const examples = {
-  goal:
-    "Build a practical no-login hackathon demo that lets Codex users coordinate multiple agents around a task.",
+const example = {
+  mission:
+    "Build a practical interface where Codex users can make several agents debate a project idea and turn disagreement into a build packet.",
   constraints:
-    "Must work as a static GitHub Pages app. No login, no backend, no API key, no install. It should make the agent committee structure visible and produce copyable prompts for Codex subagents.",
-  assets:
-    "Existing static repo, spec-first docs, grill-me run logs, product plugin concept, public GitHub Pages deployment.",
+    "Public no-login GitHub Pages demo. Static HTML/CSS/JS only. No backend, no API key, no private URLs, no install steps. Must expose the agent committee prompt structure.",
+  context:
+    "Existing repo has a static app, spec-first docs, grill-me run logs, GitHub Pages deploy, and hackathon submission draft.",
+  winningBar:
+    "A judge understands in 30 seconds that this is a useful multi-agent build workflow and can copy a real BUILD_PACKET.md.",
+  timebox: "15 minutes",
+  artifact: "Working MVP",
 };
 
-const goal = document.querySelector("#goal");
-const constraints = document.querySelector("#constraints");
-const assets = document.querySelector("#assets");
-const timebox = document.querySelector("#timebox");
-const outputFormat = document.querySelector("#outputFormat");
-const transcript = document.querySelector("#transcript");
-const promptPack = document.querySelector("#promptPack");
-const voteLabel = document.querySelector("#voteLabel");
-const riskLabel = document.querySelector("#riskLabel");
+const fields = {
+  mission: document.querySelector("#mission"),
+  constraints: document.querySelector("#constraints"),
+  context: document.querySelector("#context"),
+  winningBar: document.querySelector("#winningBar"),
+  timebox: document.querySelector("#timebox"),
+  artifact: document.querySelector("#artifact"),
+};
+
+const els = {
+  decision: document.querySelector("#decisionLabel"),
+  confidence: document.querySelector("#confidenceLabel"),
+  riskCount: document.querySelector("#riskCount"),
+  scorecard: document.querySelector("#scorecard"),
+  conflicts: document.querySelector("#conflicts"),
+  transcript: document.querySelector("#transcript"),
+  handoffs: document.querySelector("#handoffs"),
+  packet: document.querySelector("#buildPacket"),
+};
 
 document.querySelector("#loadExample").addEventListener("click", loadExample);
-document.querySelector("#runHuddle").addEventListener("click", render);
-document.querySelector("#copyPrompts").addEventListener("click", copyPrompts);
-document.querySelector("#clearRoom").addEventListener("click", clearRoom);
-[goal, constraints, assets, timebox, outputFormat].forEach((field) => field.addEventListener("input", render));
+document.querySelector("#runRoom").addEventListener("click", render);
+document.querySelector("#copyPacket").addEventListener("click", copyPacket);
+document.querySelector("#downloadMarkdown").addEventListener("click", downloadMarkdown);
+document.querySelector("#downloadJson").addEventListener("click", downloadJson);
+Object.values(fields).forEach((field) => field.addEventListener("input", render));
 
-function words(text) {
-  return text.trim().split(/\s+/).filter(Boolean);
-}
-
-function has(text, pattern) {
-  return pattern.test(text.toLowerCase());
-}
-
-function escaped(text) {
-  return text
+function escapeHtml(value) {
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-function hasAffirmedRisk(text, riskPattern, safePattern) {
-  return riskPattern.test(text) && !safePattern.test(text);
+function wordCount(value) {
+  return value.trim().split(/\s+/).filter(Boolean).length;
 }
 
-function analyze() {
-  const brief = `${goal.value} ${constraints.value} ${assets.value}`.toLowerCase();
-  const riskTerms = [
-    ["login", /login|sign in|auth/, /no login|without login|no auth|without auth/],
-    ["backend", /backend|server|database|db/, /no backend|without backend|no server|no database|static/],
-    ["private access", /private|request access|invite/, /public|no private|without private/],
-    ["install", /install|clone|run locally/, /no install|without install|no dependency|static/],
+function includesAny(text, patterns) {
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function getBrief() {
+  return {
+    mission: fields.mission.value.trim(),
+    constraints: fields.constraints.value.trim(),
+    context: fields.context.value.trim(),
+    winningBar: fields.winningBar.value.trim(),
+    timebox: fields.timebox.value,
+    artifact: fields.artifact.value,
+  };
+}
+
+function buildRisks(brief) {
+  const text = `${brief.mission} ${brief.constraints} ${brief.context} ${brief.winningBar}`;
+  const risks = [];
+  if (includesAny(text, [/login/i, /sign in/i, /auth/i]) && !includesAny(text, [/no login/i, /no auth/i])) risks.push("auth friction");
+  if (includesAny(text, [/backend/i, /server/i, /database/i, /api key/i]) && !includesAny(text, [/no backend/i, /static/i])) risks.push("backend dependency");
+  if (includesAny(text, [/private/i, /request access/i, /invite/i]) && !includesAny(text, [/public/i, /no private/i])) risks.push("private access");
+  if (includesAny(text, [/install/i, /clone/i, /run locally/i]) && !includesAny(text, [/no install/i, /browser/i])) risks.push("install friction");
+  if (wordCount(brief.mission) < 8) risks.push("thin mission");
+  if (wordCount(brief.winningBar) < 6) risks.push("unclear winning bar");
+  return risks;
+}
+
+function buildScorecard(brief, risks) {
+  const text = `${brief.mission} ${brief.constraints} ${brief.context} ${brief.winningBar}`;
+  return [
+    ["Public demo clarity", includesAny(text, [/public/i, /demo/i, /github pages/i, /no login/i])],
+    ["Codex usage visibility", includesAny(text, [/codex/i, /agent/i, /subagent/i, /committee/i])],
+    ["Practical artifact", includesAny(text, [/packet/i, /mvp/i, /spec/i, /build/i, /artifact/i])],
+    ["Scope control", risks.length <= 2],
+    ["Judge-ready story", wordCount(brief.winningBar) >= 6],
+  ].map(([label, passed]) => ({ label, passed, score: passed ? 20 : 0 }));
+}
+
+function buildVerdict(scorecard, risks) {
+  const score = scorecard.reduce((sum, item) => sum + item.score, 0);
+  const confidence = Math.max(0, Math.min(100, score - Math.max(0, risks.length - 1) * 10));
+  return {
+    label: confidence >= 80 ? "Ship" : confidence >= 50 ? "Revise" : "Reject",
+    confidence,
+  };
+}
+
+function buildConflicts(brief, risks) {
+  const defaultConflicts = [
+    ["speed vs credibility", "Keep deterministic output honest; make the exported packet the artifact."],
+    ["agent theater vs utility", "Use debate rounds, then produce tests, cut list, and handoff tasks."],
+    ["scope vs polish", `Fit the ${brief.timebox} deadline by cutting auth, backend, persistence, and live AI.`],
   ];
-  const risks = riskTerms
-    .filter(([, riskPattern, safePattern]) => hasAffirmedRisk(brief, riskPattern, safePattern))
-    .map(([name]) => name);
-  if (brief.length < 40) risks.push("unclear goal");
-  const strongStatic = has(brief, /static|github pages|public|no login/);
-  const committeeVisible = has(brief, /agent|committee|subagent|codex/);
-  const concrete = words(goal.value).length >= 8 && words(constraints.value).length >= 8;
-  const approved = concrete && committeeVisible && risks.length <= 2;
-  return { risks, strongStatic, committeeVisible, concrete, approved };
+  return risks.length
+    ? risks.map((risk) => [risk, `Mitigate by rewriting the brief or cutting features tied to ${risk}.`]).concat(defaultConflicts.slice(0, 2))
+    : defaultConflicts;
 }
 
-function agentResponse(agent, analysis) {
-  const g = goal.value || "No goal provided.";
-  const c = constraints.value || "No constraints provided.";
-  const a = assets.value || "No assets provided.";
-
-  if (agent.name === "Product Agent") {
-    return `The useful moment is when a user pastes a messy goal and immediately gets a debate transcript plus prompts they can hand to Codex agents. Keep the first screen focused on briefing the room, not explaining the tool. Goal: ${g}`;
-  }
-  if (agent.name === "Builder Agent") {
-    return `Ship it as static HTML/CSS/JS. Inputs: goal, constraints, assets, timebox, output. Outputs: transcript, vote, risk list, copyable prompt pack. Cut live AI calls and persistence. Constraints: ${c}`;
-  }
-  if (agent.name === "Skeptic Agent") {
-    return analysis.risks.length
-      ? `Risk flags: ${analysis.risks.join(", ")}. Be honest that this is a prompt orchestration interface, not autonomous agents running in the browser.`
-      : "The scope is believable. Main remaining risk is overclaiming: say it creates agent prompts and simulated committee output, not live model deliberation.";
-  }
-  return `Judge path: open the demo, load example, run huddle, inspect the four agent cards, copy the Codex prompts. The submitted repo should show the spec and run logs. Assets: ${a}`;
+function buildRounds(brief, risks, verdict) {
+  const opening = [
+    ["Product Agent", "blue", `The first useful moment is a builder seeing agents disagree and receiving a clean build packet, not just advice. Mission: ${brief.mission || "TBD"}`],
+    ["Builder Agent", "green", `Ship as static UI: case brief, debate transcript, scorecard, handoff queue, and BUILD_PACKET.md export. Constraint set: ${brief.constraints || "TBD"}`],
+    ["Skeptic Agent", "yellow", risks.length ? `I object to: ${risks.join(", ")}. These must be resolved or explicitly cut.` : "No major blockers. My objection is overclaiming; keep the deterministic/static disclosure visible."],
+    ["Judge Agent", "red", `The demo wins if the judge can load the page, click example, see the court debate, and copy the packet in under 60 seconds.`],
+  ];
+  const cross = [
+    ["Product Agent", "blue", "Builder, the packet must be useful tomorrow. Include acceptance tests and a cut list, not only prompts."],
+    ["Builder Agent", "green", "Skeptic, every objection becomes either a conflict-map row or a non-goal. No vague warnings."],
+    ["Skeptic Agent", "yellow", "Judge, do not reward agent-themed copy unless the exported artifact proves the workflow."],
+    ["Judge Agent", "red", "Product, the story must mention Codex shaping the decision and implementation, not just appearing in the UI."],
+  ];
+  const commit = [
+    ["Product Agent", "blue", "Commitment: position this as a build court that converts disagreement into an artifact."],
+    ["Builder Agent", "green", "Commitment: implement scorecard, conflict map, handoff queue, and markdown/JSON export."],
+    ["Skeptic Agent", "yellow", risks.length ? `Commitment: revise until risk count drops. Current risks: ${risks.join(", ")}.` : "Commitment: ship with honest deterministic wording."],
+    ["Judge Agent", "red", `Final verdict: ${verdict.label}. Confidence ${verdict.confidence}%. Submit live demo, repo, spec, and judging notes.`],
+  ];
+  return [
+    ["Opening Arguments", opening],
+    ["Cross-Examination", cross],
+    ["Chair Verdict", commit],
+  ];
 }
 
-function buildPromptPack() {
-  return agents
-    .map(
-      (agent) => `## ${agent.name}
-Role focus: ${agent.focus}
-Task: ${agent.prompt}
+function buildHandoffs(brief, risks) {
+  return [
+    ["Product Agent", "Sharpen first useful moment", "A one-sentence value prop and clear target user exist."],
+    ["Builder Agent", "Implement smallest working path", `Static files support ${brief.artifact}; smoke test passes.`],
+    ["Skeptic Agent", "Burn down top risk", risks[0] ? `Risk removed or documented: ${risks[0]}.` : "No high-risk blocker remains."],
+    ["Judge Agent", "Prepare proof for submission", "Live demo, repo, spec, and current status are public and direct."],
+  ];
+}
 
-Shared brief:
-- Goal: ${goal.value || "TBD"}
-- Timebox: ${timebox.value}
-- Output: ${outputFormat.value}
-- Constraints: ${constraints.value || "TBD"}
-- Assets: ${assets.value || "TBD"}
+function buildCutList() {
+  return ["live LLM calls", "login", "database", "drag-and-drop", "team accounts", "private integrations"];
+}
 
-Return:
-1. strongest recommendation
-2. top risks
-3. concrete next step
-4. vote: ship / revise / reject`
-    )
-    .join("\n\n");
+function buildPacket(state) {
+  const { brief, risks, scorecard, verdict, conflicts, handoffs } = state;
+  return `# BUILD_PACKET.md
+
+## Spec
+Problem: builders need a structured way to turn agent disagreement into an executable plan.
+User: Codex users planning, building, or judging a project.
+Artifact: ${brief.artifact}
+Deadline: ${brief.timebox}
+
+Mission:
+${brief.mission || "TBD"}
+
+Constraints:
+${brief.constraints || "TBD"}
+
+Success criteria:
+${brief.winningBar || "TBD"}
+
+## Verdict
+Decision: ${verdict.label}
+Confidence: ${verdict.confidence}%
+
+## Judge Scorecard
+${scorecard.map((item) => `- ${item.passed ? "PASS" : "MISS"}: ${item.label}`).join("\n")}
+
+## Conflict Map
+${conflicts.map(([name, mitigation]) => `- ${name}: ${mitigation}`).join("\n")}
+
+## Ruthless Cut List
+${buildCutList().map((item) => `- ${item}`).join("\n")}
+
+## Acceptance Tests
+- Public demo opens without login.
+- User can load an example and run the court.
+- Three debate rounds render.
+- Scorecard, conflict map, and handoff queue render.
+- User can copy or download this build packet.
+
+## Handoff Tasks
+${handoffs.map(([owner, task, done]) => `- ${owner}: ${task}. Done when: ${done}`).join("\n")}
+
+## Codex Subagent Prompts
+${agents
+  .map(
+    (agent) => `### ${agent.name}
+Focus: ${agent.focus}
+Mandate: ${agent.mandate}
+Shared brief: ${brief.mission || "TBD"}
+Return recommendation, top risk, concrete next step, and vote.`
+  )
+  .join("\n\n")}
+
+## Submission Pitch
+Agent Build Court is a no-login static app that turns a messy idea into a spec-first build packet through a visible multi-agent debate. Product, Builder, Skeptic, and Judge agents argue, cross-examine, issue a verdict, and export acceptance tests, a cut list, risks, handoff tasks, and Codex subagent prompts.
+`;
+}
+
+function buildState() {
+  const brief = getBrief();
+  const risks = buildRisks(brief);
+  const scorecard = buildScorecard(brief, risks);
+  const verdict = buildVerdict(scorecard, risks);
+  const conflicts = buildConflicts(brief, risks);
+  const handoffs = buildHandoffs(brief, risks);
+  const rounds = buildRounds(brief, risks, verdict);
+  const packet = buildPacket({ brief, risks, scorecard, verdict, conflicts, handoffs });
+  return { brief, risks, scorecard, verdict, conflicts, handoffs, rounds, packet };
 }
 
 function render() {
-  const analysis = analyze();
-  const responses = agents.map((agent) => ({ agent, text: agentResponse(agent, analysis) }));
-  voteLabel.textContent = analysis.approved ? "Ship" : "Revise";
-  riskLabel.textContent = `${analysis.risks.length} risk${analysis.risks.length === 1 ? "" : "s"} found`;
+  const state = buildState();
+  els.decision.textContent = state.verdict.label;
+  els.confidence.textContent = `${state.verdict.confidence}% confidence`;
+  els.riskCount.textContent = `${state.risks.length} active risk${state.risks.length === 1 ? "" : "s"}`;
 
-  transcript.innerHTML = responses
+  els.scorecard.innerHTML = state.scorecard
+    .map((item) => `<article class="${item.passed ? "pass" : "miss"}"><strong>${item.score}</strong><span>${escapeHtml(item.label)}</span></article>`)
+    .join("");
+
+  els.conflicts.innerHTML = state.conflicts
+    .map(([name, mitigation]) => `<article><strong>${escapeHtml(name)}</strong><p>${escapeHtml(mitigation)}</p></article>`)
+    .join("");
+
+  els.transcript.innerHTML = state.rounds
     .map(
-      ({ agent, text }) => `
-        <article class="agent-card ${agent.color}">
-          <div>
-            <span>${agent.focus}</span>
-            <strong>${agent.name}</strong>
-          </div>
-          <p>${escaped(text)}</p>
-        </article>
-      `
+      ([round, rows]) => `<section class="round"><h3>${round}</h3>${rows
+        .map(
+          ([name, color, text]) => `<article class="agent-card ${color}">
+            <div class="agent-meta"><span>${round}</span><strong>${name}</strong></div>
+            <p>${escapeHtml(text)}</p>
+          </article>`
+        )
+        .join("")}</section>`
     )
     .join("");
 
-  promptPack.textContent = buildPromptPack();
+  els.handoffs.innerHTML = state.handoffs
+    .map(
+      ([owner, task, done]) => `<article class="handoff">
+        <strong>${owner}</strong>
+        <p>${escapeHtml(task)}</p>
+        <span>Done when: ${escapeHtml(done)}</span>
+      </article>`
+    )
+    .join("");
+
+  els.packet.textContent = state.packet;
 }
 
-async function copyPrompts() {
-  await navigator.clipboard.writeText(promptPack.textContent);
+async function copyPacket() {
+  await navigator.clipboard.writeText(buildState().packet);
+}
+
+function download(filename, text, type) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadMarkdown() {
+  download("BUILD_PACKET.md", buildState().packet, "text/markdown");
+}
+
+function downloadJson() {
+  download("agent-build-court.json", JSON.stringify(buildState(), null, 2), "application/json");
 }
 
 function loadExample() {
-  goal.value = examples.goal;
-  constraints.value = examples.constraints;
-  assets.value = examples.assets;
-  timebox.value = "15 minutes";
-  outputFormat.value = "Working MVP";
-  render();
-}
-
-function clearRoom() {
-  goal.value = "";
-  constraints.value = "";
-  assets.value = "";
+  for (const [key, value] of Object.entries(example)) {
+    fields[key].value = value;
+  }
   render();
 }
 

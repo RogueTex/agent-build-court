@@ -2,25 +2,25 @@
 
 ## What Works
 
-- Static app loads with no account, backend, API key, or install.
-- Seeded example shows a complete Agent Huddle brief.
-- The app generates four visible agent perspectives, a ship/revise vote, risk count, and copyable prompt pack.
-- Risk checks avoid treating "no login" and "no backend" as failures.
-- User-entered transcript text is escaped before rendering.
-- The committee prompt structure is visible in the product and documented in `docs/AGENT_COMMITTEE.md`.
+- Static no-login app loads from GitHub Pages.
+- User can brief a case with project idea, deadline, artifact, constraints, assets, and winning bar.
+- App renders three debate rounds: opening arguments, cross-examination, and verdict.
+- App produces a judge scorecard, conflict map, handoff queue, and `BUILD_PACKET.md`.
+- User can copy the packet or download Markdown/JSON.
+- Repo includes spec-first documentation and grill-me/subagent debate records.
 
 ## What Is Intentionally Static
 
-Agent Huddle does not call an AI model. It generates deterministic committee output and prompts locally so the public demo can run anywhere GitHub Pages works. Users can paste the prompt pack into Codex to run the real committee.
+Agent Build Court does not call an AI model from the browser. It deterministically renders the debate and packet locally so the public demo works anywhere. The output is designed to be pasted into Codex subagents for live follow-up.
 
 ## How Codex Was Used
 
-Codex served as the build lead: it rejected the mistaken submission-checker, voted for Agent Huddle as the practical static MVP, wrote the spec-first plan, implemented the app, updated documentation, and verified the static files.
+Codex served as build lead and judge. It ran multiple agent debates, rejected the weaker submission-checker and basic prompt-generator versions, selected the stronger Build Court concept, implemented the static MVP, updated tests and docs, and deployed the repo.
 
 ## Judge Path
 
 1. Open the public demo URL.
 2. Review the seeded example.
-3. Change the goal or constraints.
-4. Click Run huddle.
-5. Inspect the four agent cards and copy the prompt pack.
+3. Click `Run court`.
+4. Inspect the scorecard, conflict map, debate rounds, and handoff queue.
+5. Copy or download `BUILD_PACKET.md`.

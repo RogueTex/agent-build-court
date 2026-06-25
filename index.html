@@ -3,48 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Agent Huddle</title>
+    <title>Agent Build Court</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <main class="app-shell">
       <section class="hero" aria-labelledby="page-title">
         <div>
-          <p class="eyebrow">Agent committee interface</p>
-          <h1 id="page-title">Agent Huddle</h1>
+          <p class="eyebrow">Codex multi-agent build court</p>
+          <h1 id="page-title">Agent Build Court</h1>
           <p class="lede">
-            Turn a messy goal into a structured agent-to-agent debate, vote, and copyable Codex subagent prompts.
+            Put a messy idea on trial. Product, Builder, Skeptic, and Judge agents argue it into a spec-first build packet.
           </p>
         </div>
-        <div class="hero-panel" aria-label="Committee result">
-          <span>Committee vote</span>
-          <strong id="voteLabel">Waiting</strong>
-          <span id="riskLabel">0 risks found</span>
+        <div class="hero-panel" aria-label="Court verdict">
+          <span>Verdict</span>
+          <strong id="decisionLabel">Stand by</strong>
+          <span id="confidenceLabel">0% confidence</span>
         </div>
       </section>
 
-      <section class="committee-strip" aria-label="Agent committee roles">
-        <article><span>Product</span><strong>user value</strong></article>
-        <article><span>Builder</span><strong>ship path</strong></article>
-        <article><span>Skeptic</span><strong>failure modes</strong></article>
-        <article><span>Judge</span><strong>demo clarity</strong></article>
+      <section class="command-strip" aria-label="Court stages">
+        <article><span>Round 1</span><strong>Opening arguments</strong></article>
+        <article><span>Round 2</span><strong>Cross-exam</strong></article>
+        <article><span>Round 3</span><strong>Verdict</strong></article>
+        <article><span>Artifact</span><strong>Build packet</strong></article>
       </section>
 
       <div class="workspace">
         <section class="panel editor-panel">
           <div class="section-heading">
-            <h2>Brief The Room</h2>
+            <h2>Case Brief</h2>
             <button class="button secondary" id="loadExample" type="button">Load example</button>
           </div>
 
           <label>
-            Goal
-            <textarea id="goal" rows="4" placeholder="What do you want the agents to solve?"></textarea>
+            Project idea
+            <textarea id="mission" rows="4" placeholder="What should the agents debate into shape?"></textarea>
           </label>
 
           <div class="grid-two">
             <label>
-              Timebox
+              Deadline
               <select id="timebox">
                 <option>15 minutes</option>
                 <option>30 minutes</option>
@@ -53,54 +53,84 @@
               </select>
             </label>
             <label>
-              Output format
-              <select id="outputFormat">
+              Target artifact
+              <select id="artifact">
                 <option>Working MVP</option>
-                <option>Implementation plan</option>
-                <option>Bug fix plan</option>
-                <option>Submission package</option>
+                <option>Build packet</option>
+                <option>Pull request plan</option>
+                <option>Launch checklist</option>
               </select>
             </label>
           </div>
 
           <label>
             Constraints
-            <textarea id="constraints" rows="4" placeholder="No login, public demo, static deploy, use current repo patterns..."></textarea>
+            <textarea id="constraints" rows="4" placeholder="No login, public demo, static deploy, no backend..."></textarea>
           </label>
 
           <label>
-            Available assets
-            <textarea id="assets" rows="3" placeholder="Existing repo, screenshots, product plugin, spec template, docs..."></textarea>
+            Existing assets
+            <textarea id="context" rows="4" placeholder="Repo, screenshots, docs, plugins, previous attempts, APIs..."></textarea>
+          </label>
+
+          <label>
+            Winning bar
+            <input id="winningBar" type="text" placeholder="What would make this hackathon-worthy?">
           </label>
 
           <div class="button-row">
-            <button class="button primary" id="runHuddle" type="button">Run huddle</button>
-            <button class="button secondary" id="copyPrompts" type="button">Copy prompts</button>
-            <button class="button secondary" id="clearRoom" type="button">Clear</button>
+            <button class="button primary" id="runRoom" type="button">Run court</button>
+            <button class="button secondary" id="copyPacket" type="button">Copy packet</button>
+            <button class="button secondary" id="downloadMarkdown" type="button">Download MD</button>
+            <button class="button secondary" id="downloadJson" type="button">Download JSON</button>
           </div>
         </section>
 
-        <aside class="panel review-panel">
+        <aside class="panel output-panel">
           <div class="section-heading">
-            <h2>Agent Transcript</h2>
-            <span id="agentCount">4 agents</span>
+            <h2>Judge Scorecard</h2>
+            <span id="riskCount">0 active risks</span>
           </div>
-          <div id="transcript" class="transcript" aria-live="polite"></div>
+          <div id="scorecard" class="scorecard"></div>
 
-          <div class="preview-card">
-            <div class="section-heading">
-              <h2>Copyable Codex Prompts</h2>
-              <span>subagents</span>
-            </div>
-            <pre id="promptPack"></pre>
+          <div class="section-heading tight">
+            <h2>Conflict Map</h2>
+            <span>tension → mitigation</span>
           </div>
+          <div id="conflicts" class="conflicts"></div>
         </aside>
       </div>
 
+      <section class="panel">
+        <div class="section-heading">
+          <h2>Agent Debate Transcript</h2>
+          <span>opening → cross-exam → verdict</span>
+        </div>
+        <div id="transcript" class="transcript" aria-live="polite"></div>
+      </section>
+
+      <section class="workspace lower">
+        <section class="panel">
+          <div class="section-heading">
+            <h2>Handoff Queue</h2>
+            <span>spawnable tasks</span>
+          </div>
+          <div id="handoffs" class="handoffs"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <h2>BUILD_PACKET.md</h2>
+            <span>copy-ready artifact</span>
+          </div>
+          <pre id="buildPacket"></pre>
+        </section>
+      </section>
+
       <section class="repo-strip" aria-label="Repository artifacts">
         <a href="docs/SPEC.md">Spec</a>
+        <a href="docs/AGENT_COMMITTEE.md">Committee prompts</a>
         <a href="docs/JUDGING.md">Judging notes</a>
-        <a href="docs/runs/run-07-practical-pivot.md">Pivot grill</a>
         <a href="SUBMISSION_DRAFT.md">Submission draft</a>
       </section>
     </main>

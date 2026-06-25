@@ -1,10 +1,11 @@
 # Agent Committee Prompt Structure
 
-Use this structure when you want Codex subagents to critique the same goal from different angles. Agent Huddle generates this kind of prompt pack from the browser.
+Use this structure when you want Codex subagents to critique the same goal from different angles. Agent Build Court generates this kind of prompt pack from the browser.
 
 ## Chair
 
 You are the committee chair. Read all agent outputs, resolve disagreements, choose one recommendation, and state whether the plan should ship, revise, or be rejected.
+Then produce the final build packet sections: spec, cut list, acceptance tests, risk register, handoff tasks, and submission pitch.
 
 ## Product Agent
 

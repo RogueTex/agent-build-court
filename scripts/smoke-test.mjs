@@ -6,27 +6,29 @@ const files = {
   js: await readFile("app.js", "utf8"),
   readme: await readFile("README.md", "utf8"),
   spec: await readFile("docs/SPEC.md", "utf8"),
-  committee: await readFile("docs/AGENT_COMMITTEE.md", "utf8"),
   judging: await readFile("docs/JUDGING.md", "utf8"),
-  submission: await readFile("SUBMISSION_DRAFT.md", "utf8")
+  committee: await readFile("docs/AGENT_COMMITTEE.md", "utf8"),
+  submission: await readFile("SUBMISSION_DRAFT.md", "utf8"),
 };
 
 const checks = [
   ["index links stylesheet", files.html.includes('href="styles.css"')],
   ["index loads app script", files.html.includes('src="app.js"')],
-  ["index names the product", files.html.includes("Agent Huddle")],
-  ["app includes agent roles", files.js.includes("Product Agent") && files.js.includes("Skeptic Agent")],
-  ["app includes risk analysis", files.js.includes("hasAffirmedRisk")],
-  ["app escapes rendered transcript text", files.js.includes("escaped(text)")],
-  ["app includes prompt pack export", files.js.includes("buildPromptPack")],
-  ["app seeds a working example", files.js.includes("loadExample();")],
-  ["styles include committee strip", files.css.includes(".committee-strip")],
-  ["styles include responsive rules", files.css.includes("@media (max-width: 960px)")],
+  ["index names the product", files.html.includes("Agent Build Court")],
+  ["app includes opening arguments", files.js.includes("Opening Arguments")],
+  ["app includes cross examination", files.js.includes("Cross-Examination")],
+  ["app includes judge scorecard", files.js.includes("buildScorecard")],
+  ["app includes conflict map", files.js.includes("buildConflicts")],
+  ["app includes handoff queue", files.js.includes("buildHandoffs")],
+  ["app includes markdown export", files.js.includes("downloadMarkdown")],
+  ["app escapes transcript text", files.js.includes("escapeHtml(text)")],
+  ["styles include scorecard", files.css.includes(".scorecard")],
+  ["styles include transcript grid", files.css.includes(".transcript")],
   ["README documents working static MVP", files.readme.includes("Working static MVP")],
-  ["spec documents committee structure", files.spec.includes("Agent Committee Prompt Structure")],
-  ["committee doc includes product agent", files.committee.includes("## Product Agent")],
+  ["spec documents build packet", files.spec.includes("BUILD_PACKET.md")],
+  ["committee doc includes Judge Agent", files.committee.includes("## Judge Agent")],
   ["judging notes explain static behavior", files.judging.includes("does not call an AI model")],
-  ["submission draft names the product", files.submission.includes("Agent Huddle")]
+  ["submission draft names the product", files.submission.includes("Agent Build Court")],
 ];
 
 const failed = checks.filter(([, passed]) => !passed);

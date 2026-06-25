@@ -1,63 +1,59 @@
-# Agent Huddle Spec
+# Agent Build Court Spec
 
 ## Problem
 
-Codex users often ask for "multiple agents" or "committee review" but do not have a simple way to turn a messy goal into clear subagent briefs, critique roles, risks, and a final ship/revise decision.
+Codex users can ask multiple agents for help, but the work often becomes scattered: one agent critiques, another plans, and the final artifact is still buried in chat. Hackathon judges also need a public no-login demo and clear proof that Codex shaped the work.
 
 ## Target User
 
-A builder using Codex who wants a fast, structured committee pass before implementing a feature, debugging a plan, or preparing a public demo.
+A builder using Codex who wants to turn a rough idea into a spec-first build packet before implementing or submitting a project.
 
 ## Product
 
-Agent Huddle is a browser-only static app that converts a goal, constraints, available assets, timebox, and desired output into:
+Agent Build Court is a static multi-agent debate interface. The user enters a project idea, constraints, assets, deadline, and winning bar. The app runs three visible rounds:
 
-- a four-agent transcript
-- a committee vote
-- a risk count
-- copyable Codex subagent prompts
+1. Opening Arguments
+2. Cross-Examination
+3. Chair Verdict
+
+It then produces:
+
+- judge scorecard
+- conflict map
+- handoff queue
+- ruthless cut list
+- acceptance tests
+- Codex subagent prompts
+- copy/download-ready `BUILD_PACKET.md`
 
 ## Agent Committee Prompt Structure
 
-The committee is intentionally visible in the product and reusable in Codex:
+- Product Agent: user value and first useful moment.
+- Builder Agent: build path, files, implementation steps, and tests.
+- Skeptic Agent: hidden dependencies, fake claims, and scope risk.
+- Judge Agent: public demo clarity, current status honesty, and Codex usage.
 
-- Product Agent: user value.
-- Builder Agent: ship path.
-- Skeptic Agent: failure modes.
-- Judge Agent: demo clarity.
+## MVP Behavior
 
-## Build Lead Vote
-
-| Option | Vote | Reason |
-| --- | --- | --- |
-| Submission checker | Reject | Too meta; it helps package the submission but is not a useful product. |
-| Interview prep sprint | Reject for this repo | Practical, but less aligned with the requested agent committee prompt structure. |
-| Agent Huddle | Ship | Useful to Codex users, static-safe, visible in the first screen, and honest about deterministic output. |
-
-## Core Flow
-
-1. User briefs the room with a goal, timebox, output format, constraints, and assets.
-2. App runs deterministic checks for risky scope signals.
-3. Four agents respond:
-   - Product Agent: user value
-   - Builder Agent: ship path
-   - Skeptic Agent: failure modes
-   - Judge Agent: demo clarity
-4. App shows a ship/revise vote and risk count.
-5. User copies the prompt pack into Codex to run the same committee with real agents.
+1. User loads the seeded example or writes a new case brief.
+2. App calculates risks and judge scorecard.
+3. Agents debate across three rounds.
+4. App issues ship / revise / reject verdict.
+5. App generates handoff tasks and a build packet.
+6. User copies or downloads Markdown/JSON.
 
 ## Non-Goals
 
 - No login.
 - No backend.
 - No database.
-- No AI API call.
+- No live AI API in browser.
+- No persistence.
 - No claim that browser agents are autonomously reasoning.
-- No persistence or private integrations.
 
 ## Success Criteria
 
-- Runs from a static public URL.
-- User can understand the product in under 10 seconds.
-- User can create useful subagent prompts in under 2 minutes.
-- Spec and run log document the build-lead vote.
+- Public static demo works without login.
+- Judge understands the product in under 30 seconds.
+- User can generate and copy a useful build packet in under 2 minutes.
+- Spec-first docs and run logs explain the Codex-led debate and pivot.
