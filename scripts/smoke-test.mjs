@@ -8,6 +8,8 @@ const files = {
   spec: await readFile("docs/SPEC.md", "utf8"),
   judging: await readFile("docs/JUDGING.md", "utf8"),
   committee: await readFile("docs/AGENT_COMMITTEE.md", "utf8"),
+  packetExample: await readFile("docs/BUILD_PACKET_EXAMPLE.md", "utf8"),
+  formAnswers: await readFile("docs/FORM_ANSWERS.md", "utf8"),
   submission: await readFile("SUBMISSION_DRAFT.md", "utf8"),
 };
 
@@ -27,6 +29,8 @@ const checks = [
   ["README documents working static MVP", files.readme.includes("Working static MVP")],
   ["spec documents build packet", files.spec.includes("BUILD_PACKET.md")],
   ["committee doc includes Judge Agent", files.committee.includes("## Judge Agent")],
+  ["packet example names BUILD_PACKET", files.packetExample.includes("# BUILD_PACKET.md Example")],
+  ["form answers include final output link", files.formAnswers.includes("BUILD_PACKET_EXAMPLE.md")],
   ["judging notes explain static behavior", files.judging.includes("does not call an AI model")],
   ["submission draft names the product", files.submission.includes("Agent Build Court")],
 ];

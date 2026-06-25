@@ -12,7 +12,7 @@ Agent Build Court is a no-login static app that turns a messy project idea into 
 
 1. Live demo: https://raghoo.me/agent-build-court/
 2. Repo/artifact: https://github.com/RogueTex/agent-build-court
-3. Spec and prompt structure: https://github.com/RogueTex/agent-build-court/blob/main/docs/SPEC.md
+3. Final output example: https://github.com/RogueTex/agent-build-court/blob/main/docs/BUILD_PACKET_EXAMPLE.md
 
 ## How Did You Use Codex?
 

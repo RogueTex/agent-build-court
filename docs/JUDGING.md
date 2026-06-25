@@ -7,6 +7,7 @@
 - App renders three debate rounds: opening arguments, cross-examination, and verdict.
 - App produces a judge scorecard, conflict map, handoff queue, and `BUILD_PACKET.md`.
 - User can copy the packet or download Markdown/JSON.
+- A static final-output example is available at `docs/BUILD_PACKET_EXAMPLE.md`.
 - Repo includes spec-first documentation and grill-me/subagent debate records.
 
 ## What Is Intentionally Static

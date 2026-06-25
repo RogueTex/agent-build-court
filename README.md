@@ -37,5 +37,7 @@ Then open `http://127.0.0.1:4173`.
 - `docs/SPEC.md` - product spec
 - `docs/AGENT_COMMITTEE.md` - reusable committee prompt structure
 - `docs/JUDGING.md` - judge-facing notes
+- `docs/BUILD_PACKET_EXAMPLE.md` - static final-output example for judges
+- `docs/FORM_ANSWERS.md` - concise form answer draft
 - `SUBMISSION_DRAFT.md` - copy-ready submission draft
 - `scripts/smoke-test.mjs` - static repo smoke test
