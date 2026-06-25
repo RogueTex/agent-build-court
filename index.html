@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo Gatekeeper</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Codex Hackathon Submission Readiness</p>
+          <h1 id="page-title">Demo Gatekeeper</h1>
+          <p class="lede">
+            Package a judge-ready project submission, catch access risks, and export copy that matches the Codex Hackathon form.
+          </p>
+        </div>
+        <div class="hero-panel" aria-label="Readiness score">
+          <span class="score-label">Readiness</span>
+          <strong id="scoreValue">0%</strong>
+          <span id="scoreTone">Needs inputs</span>
+        </div>
+      </section>
+
+      <section class="method-strip" aria-label="Agent vote summary">
+        <article>
+          <span>Product grill</span>
+          <strong><a href="docs/runs/run-01-product-grill.md">Submission builder</a></strong>
+        </article>
+        <article>
+          <span>Build grill</span>
+          <strong><a href="docs/runs/run-02-build-grill.md">Demo gatekeeper</a></strong>
+        </article>
+        <article>
+          <span>Chair vote</span>
+          <strong><a href="docs/runs/run-03-chair-vote.md">Build the hybrid</a></strong>
+        </article>
+      </section>
+
+      <div class="workspace">
+        <form class="editor" id="submissionForm">
+          <div class="section-heading">
+            <h2>Submission Inputs</h2>
+            <button class="button secondary" id="seedButton" type="button">Load example</button>
+          </div>
+
+          <label>
+            Project title
+            <input id="projectTitle" name="projectTitle" type="text" autocomplete="off" placeholder="Demo Gatekeeper">
+          </label>
+
+          <label>
+            What did you build? <span>2-4 sentences</span>
+            <textarea id="projectDescription" name="projectDescription" rows="5" placeholder="Describe what it does, who it is for, and what judges should inspect first."></textarea>
+          </label>
+
+          <div class="grid-two">
+            <label>
+              Live demo URL
+              <input id="demoUrl" name="demoUrl" type="url" placeholder="https://example.com">
+            </label>
+            <label>
+              Repo or artifact URL
+              <input id="repoUrl" name="repoUrl" type="url" placeholder="https://github.com/user/repo">
+            </label>
+          </div>
+
+          <label>
+            Backup screenshot, video, or final-output URL
+            <input id="backupUrl" name="backupUrl" type="url" placeholder="https://...">
+          </label>
+
+          <fieldset>
+            <legend>Judge access model</legend>
+            <div class="segmented">
+              <label><input type="radio" name="accessModel" value="No login" checked> No login</label>
+              <label><input type="radio" name="accessModel" value="Login required"> Login</label>
+              <label><input type="radio" name="accessModel" value="Invite or request access"> Invite</label>
+              <label><input type="radio" name="accessModel" value="Local install"> Local install</label>
+            </div>
+          </fieldset>
+
+          <label>
+            How did you use Codex?
+            <textarea id="codexUsage" name="codexUsage" rows="5" placeholder="Be specific: what did Codex help build, debug, design, test, or improve?"></textarea>
+          </label>
+
+          <div class="grid-two">
+            <label>
+              Current status
+              <select id="currentStatus" name="currentStatus">
+                <option value="">Choose status</option>
+                <option>Working MVP</option>
+                <option>Partially working</option>
+                <option>Mocked demo</option>
+                <option>Broken</option>
+              </select>
+            </label>
+            <label>
+              Judge path
+              <input id="judgePath" name="judgePath" type="text" placeholder="Open demo, click Load example, inspect checklist">
+            </label>
+          </div>
+
+          <label>
+            Known limitations
+            <textarea id="limitations" name="limitations" rows="4" placeholder="State what is heuristic, partial, mocked, or future work."></textarea>
+          </label>
+        </form>
+
+        <aside class="review" aria-label="Live review">
+          <div class="section-heading">
+            <h2>Gate Check</h2>
+            <button class="button primary" id="copyButton" type="button">Copy packet</button>
+          </div>
+          <div id="checklist" class="checklist" aria-live="polite"></div>
+
+          <div class="preview-card">
+            <div class="section-heading">
+              <h2>Judge Preview</h2>
+              <span id="sentenceCount">0 sentences</span>
+            </div>
+            <div id="judgePreview" class="judge-preview"></div>
+          </div>
+
+          <div class="preview-card">
+            <div class="section-heading">
+              <h2>Submission Packet</h2>
+              <span>Markdown</span>
+            </div>
+            <pre id="packetPreview"></pre>
+          </div>
+        </aside>
+      </div>
+
+      <section class="repo-strip" aria-label="Repository artifacts">
+        <a href="docs/SPEC.md">Spec</a>
+        <a href="docs/JUDGING.md">Judging notes</a>
+        <a href="docs/runs/run-04-verification.md">Verification</a>
+        <a href="SUBMISSION_DRAFT.md">Submission draft</a>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

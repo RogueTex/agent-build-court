@@ -1,0 +1,19 @@
+{
+  "name": "demo-gatekeeper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A no-login static MVP that helps Codex Hackathon builders package judge-ready submissions.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "check": "node --check app.js && node scripts/smoke-test.mjs",
+    "test": "npm run check"
+  },
+  "keywords": [
+    "codex",
+    "hackathon",
+    "static-site",
+    "submission-checker"
+  ],
+  "license": "MIT"
+}
