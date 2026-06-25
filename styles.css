@@ -241,6 +241,24 @@ select:focus {
   color: #183d78;
 }
 
+.run-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.run-status.active {
+  border-color: #b8d7c9;
+  background: var(--soft-green);
+  color: var(--green);
+}
+
 .scorecard,
 .conflicts,
 .handoffs {
@@ -299,6 +317,22 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.transcript.just-ran {
+  animation: court-run 0.8s ease-out;
+}
+
+@keyframes court-run {
+  0% {
+    outline: 3px solid rgba(31, 111, 91, 0.38);
+    outline-offset: 4px;
+  }
+
+  100% {
+    outline: 3px solid rgba(31, 111, 91, 0);
+    outline-offset: 10px;
+  }
 }
 
 .round {
@@ -385,6 +419,12 @@ pre {
 
 .repo-strip a:hover {
   color: var(--blue);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transcript.just-ran {
+    animation: none;
+  }
 }
 
 @media (max-width: 1050px) {

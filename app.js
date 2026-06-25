@@ -60,14 +60,18 @@ const els = {
   transcript: document.querySelector("#transcript"),
   handoffs: document.querySelector("#handoffs"),
   packet: document.querySelector("#buildPacket"),
+  runButton: document.querySelector("#runRoom"),
+  runStatus: document.querySelector("#runStatus"),
 };
 
 document.querySelector("#loadExample").addEventListener("click", loadExample);
-document.querySelector("#runRoom").addEventListener("click", render);
+els.runButton.addEventListener("click", runCourt);
 document.querySelector("#copyPacket").addEventListener("click", copyPacket);
 document.querySelector("#downloadMarkdown").addEventListener("click", downloadMarkdown);
 document.querySelector("#downloadJson").addEventListener("click", downloadJson);
 Object.values(fields).forEach((field) => field.addEventListener("input", render));
+
+let runFeedbackTimer;
 
 function escapeHtml(value) {
   return String(value)
@@ -287,6 +291,22 @@ function render() {
     .join("");
 
   els.packet.textContent = state.packet;
+}
+
+function runCourt() {
+  render();
+  window.clearTimeout(runFeedbackTimer);
+  els.runButton.textContent = "Court ran";
+  els.runStatus.textContent = "Verdict refreshed";
+  els.runStatus.classList.add("active");
+  els.transcript.classList.remove("just-ran");
+  void els.transcript.offsetWidth;
+  els.transcript.classList.add("just-ran");
+  runFeedbackTimer = window.setTimeout(() => {
+    els.runButton.textContent = "Run court";
+    els.runStatus.textContent = "Ready";
+    els.runStatus.classList.remove("active");
+  }, 1400);
 }
 
 async function copyPacket() {
