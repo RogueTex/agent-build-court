@@ -1,8 +1,8 @@
 {
-  "name": "demo-gatekeeper",
+  "name": "agent-huddle",
   "version": "0.1.0",
   "private": true,
-  "description": "A no-login static MVP that helps Codex Hackathon builders package judge-ready submissions.",
+  "description": "A no-login static MVP that turns a goal into an agent committee transcript and copyable Codex subagent prompts.",
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 4173",
@@ -11,9 +11,9 @@
   },
   "keywords": [
     "codex",
-    "hackathon",
-    "static-site",
-    "submission-checker"
+    "agent-committee",
+    "prompt-orchestration",
+    "static-site"
   ],
   "license": "MIT"
 }

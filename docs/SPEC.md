@@ -1,44 +1,63 @@
-# Demo Gatekeeper Spec
+# Agent Huddle Spec
 
 ## Problem
 
-Hackathon builders often lose judging points because their demos are not directly accessible. The submission form explicitly warns that judges may only evaluate submitted materials and may not log in, request access, install anything, or run local/private URLs.
+Codex users often ask for "multiple agents" or "committee review" but do not have a simple way to turn a messy goal into clear subagent briefs, critique roles, risks, and a final ship/revise decision.
 
 ## Target User
 
-A Codex Hackathon participant preparing a final submission under time pressure.
+A builder using Codex who wants a fast, structured committee pass before implementing a feature, debugging a plan, or preparing a public demo.
 
 ## Product
 
-Demo Gatekeeper is a browser-only static app that checks the shape of a submission and generates a copy-ready judge packet.
+Agent Huddle is a browser-only static app that converts a goal, constraints, available assets, timebox, and desired output into:
+
+- a four-agent transcript
+- a committee vote
+- a risk count
+- copyable Codex subagent prompts
+
+## Agent Committee Prompt Structure
+
+The committee is intentionally visible in the product and reusable in Codex:
+
+- Product Agent: user value.
+- Builder Agent: ship path.
+- Skeptic Agent: failure modes.
+- Judge Agent: demo clarity.
+
+## Build Lead Vote
+
+| Option | Vote | Reason |
+| --- | --- | --- |
+| Submission checker | Reject | Too meta; it helps package the submission but is not a useful product. |
+| Interview prep sprint | Reject for this repo | Practical, but less aligned with the requested agent committee prompt structure. |
+| Agent Huddle | Ship | Useful to Codex users, static-safe, visible in the first screen, and honest about deterministic output. |
 
 ## Core Flow
 
-1. Entrant fills in project title, build description, demo URL, repo URL, backup URL, Codex usage, status, limitations, and judge path.
-2. App runs deterministic checks:
-   - title present
-   - build description is 2-4 sentences
-   - demo URL is HTTP(S)
-   - demo URL is not local/private
-   - repo/artifact URL is present
-   - access model is no-login
-   - Codex usage explicitly mentions Codex
-   - current status is filled
-   - risky access language is flagged
-3. App displays a readiness score and checklist.
-4. App generates markdown that can be pasted into the submission form.
+1. User briefs the room with a goal, timebox, output format, constraints, and assets.
+2. App runs deterministic checks for risky scope signals.
+3. Four agents respond:
+   - Product Agent: user value
+   - Builder Agent: ship path
+   - Skeptic Agent: failure modes
+   - Judge Agent: demo clarity
+4. App shows a ship/revise vote and risk count.
+5. User copies the prompt pack into Codex to run the same committee with real agents.
 
 ## Non-Goals
 
-- No live network validation.
 - No login.
+- No backend.
 - No database.
 - No AI API call.
-- No install requirement for judges.
+- No claim that browser agents are autonomously reasoning.
+- No persistence or private integrations.
 
 ## Success Criteria
 
 - Runs from a static public URL.
-- Judge can understand the product in under 10 seconds.
-- User can copy a submission packet in under 2 minutes.
-- README and run logs explain how Codex shaped the project.
+- User can understand the product in under 10 seconds.
+- User can create useful subagent prompts in under 2 minutes.
+- Spec and run log document the build-lead vote.

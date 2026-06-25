@@ -1,24 +1,30 @@
-# Demo Gatekeeper
+# Agent Huddle
 
-Demo Gatekeeper is a no-login static MVP for Codex Hackathon builders. It helps package a judge-ready submission, flags obvious access risks, checks the 2-4 sentence description requirement, and exports copy-ready markdown for the submission form.
+Agent Huddle is a no-login static MVP that turns a messy goal into a structured agent committee transcript, ship/revise vote, risk list, and copyable Codex subagent prompts.
+
+## Build Lead Vote
+
+Winner: Agent Huddle.
+
+Rejected: the old submission checker. It was shippable, but too meta. Agent Huddle is more useful as a public demo because it gives Codex users a practical prompt-orchestration tool while staying static, dependency-free, and honest about not running live AI in the browser.
 
 ## Demo
 
-Public demo URL: https://raghoo.me/demo-gatekeeper/
+Public demo URL: https://raghoo.me/agent-huddle/
 
-Repository URL: https://github.com/RogueTex/demo-gatekeeper
+Repository URL: https://github.com/RogueTex/agent-huddle
 
 ## Why This Project
 
-The submission form says judges can only evaluate direct, judge-accessible materials and may not log in, request access, install anything, or run local/private URLs. It also says Codex usage is the biggest scoring category. Demo Gatekeeper turns those requirements into a working product.
+The constraints are strict: GitHub Pages, no backend, no login, no dependencies, public demo, spec-first documentation, and visible agent committee structure. Agent Huddle fits those constraints by making the committee workflow itself the product: brief the room, inspect deterministic agent perspectives, and copy the real prompts into Codex.
 
 ## How Codex Was Used
 
-Codex helped interpret the submission form, run a two-agent grill/vote, compare candidate MVPs, create markdown run records, choose the safest 30-minute scope, implement the static app, refine the UI, and prepare submission-ready text.
+Codex acted as the build lead: reject the mistaken meta product, grill candidate MVPs, vote on Agent Huddle, write the spec-first doc, implement the static HTML/CSS/JS app, refine the risk checks, and update the submission artifacts.
 
 ## Status
 
-Working static MVP. Link checks are deterministic format and access-risk checks, not live network verification. The app has no backend, no login, no database, and no dependency install.
+Working static MVP. There is no backend, login, database, dependency install, or live AI call. The browser generates deterministic committee output and prompt packets locally.
 
 ## Quick Start
 
@@ -33,23 +39,14 @@ Then open `http://127.0.0.1:4173`.
 
 - `index.html` - app shell
 - `styles.css` - responsive UI
-- `app.js` - scoring, validation, preview, and export
-- `package.json` - local scripts
-- `docs/pages-workflow.yml.example` - optional GitHub Pages workflow template
+- `app.js` - committee transcript, vote, risk checks, and prompt export
 - `docs/SPEC.md` - product spec
+- `docs/AGENT_COMMITTEE.md` - reusable committee prompt structure
 - `docs/JUDGING.md` - judge-facing notes
-- `docs/runs/run-01-product-grill.md` - product critique and vote
-- `docs/runs/run-02-build-grill.md` - build critique and vote
-- `docs/runs/run-03-chair-vote.md` - final MVP spec
-- `docs/runs/run-04-verification.md` - local verification record
-- `docs/runs/run-05-repo-grill.md` - final repo acceptance vote
-- `docs/runs/run-06-deployment.md` - public GitHub Pages deployment check
-- `SUBMISSION_DRAFT.md` - copy-ready form draft with public links
-
-## Local Preview
-
-Open `index.html` in a browser, or serve the folder with any static server.
+- `docs/runs/run-07-practical-pivot.md` - fast build-lead grill and vote
+- `SUBMISSION_DRAFT.md` - copy-ready submission draft
+- `scripts/smoke-test.mjs` - static repo smoke test
 
 ## Deployment
 
-Deploy these static files to any public static host such as GitHub Pages, Netlify Drop, Cloudflare Pages, or Vercel. The submitted demo link must be public and must not require login or access approval.
+Deploy the repository root to GitHub Pages or any static host. The submitted demo link should be public and should not require login, install steps, or access approval.

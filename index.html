@@ -3,133 +3,96 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Demo Gatekeeper</title>
+    <title>Agent Huddle</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <main class="app-shell">
       <section class="hero" aria-labelledby="page-title">
         <div>
-          <p class="eyebrow">Codex Hackathon Submission Readiness</p>
-          <h1 id="page-title">Demo Gatekeeper</h1>
+          <p class="eyebrow">Agent committee interface</p>
+          <h1 id="page-title">Agent Huddle</h1>
           <p class="lede">
-            Package a judge-ready project submission, catch access risks, and export copy that matches the Codex Hackathon form.
+            Turn a messy goal into a structured agent-to-agent debate, vote, and copyable Codex subagent prompts.
           </p>
         </div>
-        <div class="hero-panel" aria-label="Readiness score">
-          <span class="score-label">Readiness</span>
-          <strong id="scoreValue">0%</strong>
-          <span id="scoreTone">Needs inputs</span>
+        <div class="hero-panel" aria-label="Committee result">
+          <span>Committee vote</span>
+          <strong id="voteLabel">Waiting</strong>
+          <span id="riskLabel">0 risks found</span>
         </div>
       </section>
 
-      <section class="method-strip" aria-label="Agent vote summary">
-        <article>
-          <span>Product grill</span>
-          <strong><a href="docs/runs/run-01-product-grill.md">Submission builder</a></strong>
-        </article>
-        <article>
-          <span>Build grill</span>
-          <strong><a href="docs/runs/run-02-build-grill.md">Demo gatekeeper</a></strong>
-        </article>
-        <article>
-          <span>Chair vote</span>
-          <strong><a href="docs/runs/run-03-chair-vote.md">Build the hybrid</a></strong>
-        </article>
+      <section class="committee-strip" aria-label="Agent committee roles">
+        <article><span>Product</span><strong>user value</strong></article>
+        <article><span>Builder</span><strong>ship path</strong></article>
+        <article><span>Skeptic</span><strong>failure modes</strong></article>
+        <article><span>Judge</span><strong>demo clarity</strong></article>
       </section>
 
       <div class="workspace">
-        <form class="editor" id="submissionForm">
+        <section class="panel editor-panel">
           <div class="section-heading">
-            <h2>Submission Inputs</h2>
-            <button class="button secondary" id="seedButton" type="button">Load example</button>
+            <h2>Brief The Room</h2>
+            <button class="button secondary" id="loadExample" type="button">Load example</button>
           </div>
 
           <label>
-            Project title
-            <input id="projectTitle" name="projectTitle" type="text" autocomplete="off" placeholder="Demo Gatekeeper">
-          </label>
-
-          <label>
-            What did you build? <span>2-4 sentences</span>
-            <textarea id="projectDescription" name="projectDescription" rows="5" placeholder="Describe what it does, who it is for, and what judges should inspect first."></textarea>
+            Goal
+            <textarea id="goal" rows="4" placeholder="What do you want the agents to solve?"></textarea>
           </label>
 
           <div class="grid-two">
             <label>
-              Live demo URL
-              <input id="demoUrl" name="demoUrl" type="url" placeholder="https://example.com">
-            </label>
-            <label>
-              Repo or artifact URL
-              <input id="repoUrl" name="repoUrl" type="url" placeholder="https://github.com/user/repo">
-            </label>
-          </div>
-
-          <label>
-            Backup screenshot, video, or final-output URL
-            <input id="backupUrl" name="backupUrl" type="url" placeholder="https://...">
-          </label>
-
-          <fieldset>
-            <legend>Judge access model</legend>
-            <div class="segmented">
-              <label><input type="radio" name="accessModel" value="No login" checked> No login</label>
-              <label><input type="radio" name="accessModel" value="Login required"> Login</label>
-              <label><input type="radio" name="accessModel" value="Invite or request access"> Invite</label>
-              <label><input type="radio" name="accessModel" value="Local install"> Local install</label>
-            </div>
-          </fieldset>
-
-          <label>
-            How did you use Codex?
-            <textarea id="codexUsage" name="codexUsage" rows="5" placeholder="Be specific: what did Codex help build, debug, design, test, or improve?"></textarea>
-          </label>
-
-          <div class="grid-two">
-            <label>
-              Current status
-              <select id="currentStatus" name="currentStatus">
-                <option value="">Choose status</option>
-                <option>Working MVP</option>
-                <option>Partially working</option>
-                <option>Mocked demo</option>
-                <option>Broken</option>
+              Timebox
+              <select id="timebox">
+                <option>15 minutes</option>
+                <option>30 minutes</option>
+                <option>2 hours</option>
+                <option>1 day</option>
               </select>
             </label>
             <label>
-              Judge path
-              <input id="judgePath" name="judgePath" type="text" placeholder="Open demo, click Load example, inspect checklist">
+              Output format
+              <select id="outputFormat">
+                <option>Working MVP</option>
+                <option>Implementation plan</option>
+                <option>Bug fix plan</option>
+                <option>Submission package</option>
+              </select>
             </label>
           </div>
 
           <label>
-            Known limitations
-            <textarea id="limitations" name="limitations" rows="4" placeholder="State what is heuristic, partial, mocked, or future work."></textarea>
+            Constraints
+            <textarea id="constraints" rows="4" placeholder="No login, public demo, static deploy, use current repo patterns..."></textarea>
           </label>
-        </form>
 
-        <aside class="review" aria-label="Live review">
+          <label>
+            Available assets
+            <textarea id="assets" rows="3" placeholder="Existing repo, screenshots, product plugin, spec template, docs..."></textarea>
+          </label>
+
+          <div class="button-row">
+            <button class="button primary" id="runHuddle" type="button">Run huddle</button>
+            <button class="button secondary" id="copyPrompts" type="button">Copy prompts</button>
+            <button class="button secondary" id="clearRoom" type="button">Clear</button>
+          </div>
+        </section>
+
+        <aside class="panel review-panel">
           <div class="section-heading">
-            <h2>Gate Check</h2>
-            <button class="button primary" id="copyButton" type="button">Copy packet</button>
+            <h2>Agent Transcript</h2>
+            <span id="agentCount">4 agents</span>
           </div>
-          <div id="checklist" class="checklist" aria-live="polite"></div>
+          <div id="transcript" class="transcript" aria-live="polite"></div>
 
           <div class="preview-card">
             <div class="section-heading">
-              <h2>Judge Preview</h2>
-              <span id="sentenceCount">0 sentences</span>
+              <h2>Copyable Codex Prompts</h2>
+              <span>subagents</span>
             </div>
-            <div id="judgePreview" class="judge-preview"></div>
-          </div>
-
-          <div class="preview-card">
-            <div class="section-heading">
-              <h2>Submission Packet</h2>
-              <span>Markdown</span>
-            </div>
-            <pre id="packetPreview"></pre>
+            <pre id="promptPack"></pre>
           </div>
         </aside>
       </div>
@@ -137,7 +100,7 @@
       <section class="repo-strip" aria-label="Repository artifacts">
         <a href="docs/SPEC.md">Spec</a>
         <a href="docs/JUDGING.md">Judging notes</a>
-        <a href="docs/runs/run-04-verification.md">Verification</a>
+        <a href="docs/runs/run-07-practical-pivot.md">Pivot grill</a>
         <a href="SUBMISSION_DRAFT.md">Submission draft</a>
       </section>
     </main>

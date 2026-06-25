@@ -1,261 +1,181 @@
-const form = document.querySelector("#submissionForm");
-const scoreValue = document.querySelector("#scoreValue");
-const scoreTone = document.querySelector("#scoreTone");
-const checklist = document.querySelector("#checklist");
-const judgePreview = document.querySelector("#judgePreview");
-const packetPreview = document.querySelector("#packetPreview");
-const sentenceCount = document.querySelector("#sentenceCount");
-const seedButton = document.querySelector("#seedButton");
-const copyButton = document.querySelector("#copyButton");
+const agents = [
+  {
+    name: "Product Agent",
+    focus: "user value",
+    color: "blue",
+    prompt:
+      "Pressure-test the goal for real user value. Ask who needs it, what pain it removes, and what the first useful moment is.",
+  },
+  {
+    name: "Builder Agent",
+    focus: "ship path",
+    color: "green",
+    prompt:
+      "Reduce the idea to the smallest working artifact. Name files, implementation steps, and anything to cut.",
+  },
+  {
+    name: "Skeptic Agent",
+    focus: "failure modes",
+    color: "yellow",
+    prompt:
+      "Attack the plan. Identify hidden dependencies, fake claims, demo risks, and places where the scope is too big.",
+  },
+  {
+    name: "Judge Agent",
+    focus: "demo clarity",
+    color: "red",
+    prompt:
+      "Evaluate whether the final output can be understood quickly from submitted materials, with no login or private context.",
+  },
+];
 
-const example = {
-  projectTitle: "Demo Gatekeeper",
-  projectDescription:
-    "Demo Gatekeeper is a no-login submission readiness tool for Codex Hackathon builders. It checks whether a project has judge-accessible links, a clear 2-minute judge path, an honest status note, and a strong Codex usage explanation. Judges should first inspect the Gate Check score and the generated submission packet.",
-  demoUrl: "https://raghoo.me/demo-gatekeeper/",
-  repoUrl: "https://github.com/RogueTex/demo-gatekeeper",
-  backupUrl: "https://github.com/RogueTex/demo-gatekeeper/blob/main/docs/JUDGING.md",
-  codexUsage:
-    "Codex helped run a two-agent grill session, compare candidate projects against the actual submission form, vote on the safest 30-minute MVP, create markdown run records, implement the static app, refine the UI, and prepare copy-ready submission text.",
-  currentStatus: "Working MVP",
-  judgePath: "Open the live demo, review the seeded example, inspect Gate Check, then copy the generated packet.",
-  limitations:
-    "The app performs deterministic format and access-risk checks only. It does not crawl URLs or verify whether a remote page is truly online because that would be unreliable from a static browser-only MVP.",
-  accessModel: "No login",
+const examples = {
+  goal:
+    "Build a practical no-login hackathon demo that lets Codex users coordinate multiple agents around a task.",
+  constraints:
+    "Must work as a static GitHub Pages app. No login, no backend, no API key, no install. It should make the agent committee structure visible and produce copyable prompts for Codex subagents.",
+  assets:
+    "Existing static repo, spec-first docs, grill-me run logs, product plugin concept, public GitHub Pages deployment.",
 };
 
-const labels = {
-  pass: "✓",
-  warn: "!",
-  fail: "×",
-};
+const goal = document.querySelector("#goal");
+const constraints = document.querySelector("#constraints");
+const assets = document.querySelector("#assets");
+const timebox = document.querySelector("#timebox");
+const outputFormat = document.querySelector("#outputFormat");
+const transcript = document.querySelector("#transcript");
+const promptPack = document.querySelector("#promptPack");
+const voteLabel = document.querySelector("#voteLabel");
+const riskLabel = document.querySelector("#riskLabel");
 
-function getData() {
-  const data = Object.fromEntries(new FormData(form).entries());
-  data.accessModel = new FormData(form).get("accessModel") || "No login";
-  return data;
+document.querySelector("#loadExample").addEventListener("click", loadExample);
+document.querySelector("#runHuddle").addEventListener("click", render);
+document.querySelector("#copyPrompts").addEventListener("click", copyPrompts);
+document.querySelector("#clearRoom").addEventListener("click", clearRoom);
+[goal, constraints, assets, timebox, outputFormat].forEach((field) => field.addEventListener("input", render));
+
+function words(text) {
+  return text.trim().split(/\s+/).filter(Boolean);
 }
 
-function sentenceTotal(text) {
-  const matches = text
-    .trim()
-    .replace(/\b(?:e\.g|i\.e)\./gi, "")
-    .match(/[^.!?]+[.!?]+(?:\s|$)/g);
-  if (!text.trim()) return 0;
-  return matches ? matches.length : 1;
+function has(text, pattern) {
+  return pattern.test(text.toLowerCase());
 }
 
-function isHttpUrl(value) {
-  if (!value.trim()) return false;
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
-  }
+function escaped(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
-function isLocalUrl(value) {
-  if (!value.trim()) return false;
-  const lower = value.toLowerCase();
-  return (
-    lower.includes("localhost") ||
-    lower.includes("127.0.0.1") ||
-    lower.includes("0.0.0.0") ||
-    lower.includes("file://") ||
-    lower.includes("192.168.") ||
-    lower.includes("10.0.") ||
-    lower.includes("172.16.")
-  );
+function hasAffirmedRisk(text, riskPattern, safePattern) {
+  return riskPattern.test(text) && !safePattern.test(text);
 }
 
-function hasRiskLanguage(text) {
-  return /(request access|ask me|dm me|log in|login|sign in|install|clone|run locally|localhost|private url|invite)/i.test(
-    text
-  );
-}
-
-function evaluate(data) {
-  const descriptionSentences = sentenceTotal(data.projectDescription || "");
-  const allLinks = [data.demoUrl, data.repoUrl, data.backupUrl].filter(Boolean).join(" ");
-  const codexMentions = /codex/i.test(data.codexUsage || "");
-  const localLinks = [data.demoUrl, data.repoUrl, data.backupUrl].filter(isLocalUrl);
-  const accessRisk = data.accessModel !== "No login";
-  const riskText = [data.projectDescription, data.codexUsage, data.limitations, data.judgePath].join(" ");
-
-  const checks = [
-    {
-      key: "title",
-      status: data.projectTitle.trim() ? "pass" : "fail",
-      title: "Project title",
-      detail: data.projectTitle.trim() ? "Ready for the form." : "Add a concise title.",
-    },
-    {
-      key: "description",
-      status: descriptionSentences >= 2 && descriptionSentences <= 4 ? "pass" : "fail",
-      title: "2-4 sentence build description",
-      detail:
-        descriptionSentences >= 2 && descriptionSentences <= 4
-          ? `${descriptionSentences} sentences fits the requirement.`
-          : `${descriptionSentences} sentences found; the form asks for 2-4.`,
-    },
-    {
-      key: "demo",
-      status: isHttpUrl(data.demoUrl || "") && !isLocalUrl(data.demoUrl || "") ? "pass" : "fail",
-      title: "Public-looking live demo link",
-      detail: data.demoUrl ? "Uses an HTTP(S) URL and avoids local patterns." : "Add the live demo URL first.",
-    },
-    {
-      key: "repo",
-      status: isHttpUrl(data.repoUrl || "") && !isLocalUrl(data.repoUrl || "") ? "pass" : "warn",
-      title: "Repo or artifact link",
-      detail: data.repoUrl ? "Artifact link is present." : "Recommended by the form; add it if available.",
-    },
-    {
-      key: "access",
-      status: accessRisk ? "fail" : "pass",
-      title: "No login, access request, or install",
-      detail: accessRisk ? `Selected access model: ${data.accessModel}.` : "Judges can evaluate without credentials.",
-    },
-    {
-      key: "local",
-      status: localLinks.length ? "fail" : "pass",
-      title: "No local/private URLs",
-      detail: localLinks.length ? `Risky link found: ${localLinks.join(", ")}` : "No obvious local/private URL patterns.",
-    },
-    {
-      key: "codex",
-      status: data.codexUsage.trim() && codexMentions ? "pass" : "fail",
-      title: "Specific Codex usage",
-      detail: codexMentions ? "Codex is explicitly named." : "Mention Codex and what it helped build or improve.",
-    },
-    {
-      key: "status",
-      status: data.currentStatus ? "pass" : "fail",
-      title: "Current status",
-      detail: data.currentStatus ? `Status: ${data.currentStatus}.` : "State what works, what is partial, and what is broken.",
-    },
-    {
-      key: "risk-copy",
-      status: hasRiskLanguage(`${allLinks} ${riskText}`) ? "warn" : "pass",
-      title: "Access-risk language",
-      detail: hasRiskLanguage(`${allLinks} ${riskText}`)
-        ? "Review wording for login, install, request-access, or local-only language."
-        : "No obvious access-risk phrases found.",
-    },
+function analyze() {
+  const brief = `${goal.value} ${constraints.value} ${assets.value}`.toLowerCase();
+  const riskTerms = [
+    ["login", /login|sign in|auth/, /no login|without login|no auth|without auth/],
+    ["backend", /backend|server|database|db/, /no backend|without backend|no server|no database|static/],
+    ["private access", /private|request access|invite/, /public|no private|without private/],
+    ["install", /install|clone|run locally/, /no install|without install|no dependency|static/],
   ];
-
-  const score = Math.round(
-    (checks.reduce((total, check) => total + (check.status === "pass" ? 1 : check.status === "warn" ? 0.5 : 0), 0) /
-      checks.length) *
-      100
-  );
-
-  return { checks, score, descriptionSentences };
+  const risks = riskTerms
+    .filter(([, riskPattern, safePattern]) => hasAffirmedRisk(brief, riskPattern, safePattern))
+    .map(([name]) => name);
+  if (brief.length < 40) risks.push("unclear goal");
+  const strongStatic = has(brief, /static|github pages|public|no login/);
+  const committeeVisible = has(brief, /agent|committee|subagent|codex/);
+  const concrete = words(goal.value).length >= 8 && words(constraints.value).length >= 8;
+  const approved = concrete && committeeVisible && risks.length <= 2;
+  return { risks, strongStatic, committeeVisible, concrete, approved };
 }
 
-function packet(data, results) {
-  return `# ${data.projectTitle || "Untitled project"}
+function agentResponse(agent, analysis) {
+  const g = goal.value || "No goal provided.";
+  const c = constraints.value || "No constraints provided.";
+  const a = assets.value || "No assets provided.";
 
-## What Did You Build?
-${data.projectDescription || "TBD"}
+  if (agent.name === "Product Agent") {
+    return `The useful moment is when a user pastes a messy goal and immediately gets a debate transcript plus prompts they can hand to Codex agents. Keep the first screen focused on briefing the room, not explaining the tool. Goal: ${g}`;
+  }
+  if (agent.name === "Builder Agent") {
+    return `Ship it as static HTML/CSS/JS. Inputs: goal, constraints, assets, timebox, output. Outputs: transcript, vote, risk list, copyable prompt pack. Cut live AI calls and persistence. Constraints: ${c}`;
+  }
+  if (agent.name === "Skeptic Agent") {
+    return analysis.risks.length
+      ? `Risk flags: ${analysis.risks.join(", ")}. Be honest that this is a prompt orchestration interface, not autonomous agents running in the browser.`
+      : "The scope is believable. Main remaining risk is overclaiming: say it creates agent prompts and simulated committee output, not live model deliberation.";
+  }
+  return `Judge path: open the demo, load example, run huddle, inspect the four agent cards, copy the Codex prompts. The submitted repo should show the spec and run logs. Assets: ${a}`;
+}
 
-## Links For Judges
-1. Live demo: ${data.demoUrl || "TBD"}
-2. Repo/artifact: ${data.repoUrl || "TBD"}
-3. Screenshot/video/final output: ${data.backupUrl || "TBD"}
+function buildPromptPack() {
+  return agents
+    .map(
+      (agent) => `## ${agent.name}
+Role focus: ${agent.focus}
+Task: ${agent.prompt}
 
-## How Did You Use Codex?
-${data.codexUsage || "TBD"}
+Shared brief:
+- Goal: ${goal.value || "TBD"}
+- Timebox: ${timebox.value}
+- Output: ${outputFormat.value}
+- Constraints: ${constraints.value || "TBD"}
+- Assets: ${assets.value || "TBD"}
 
-## Current Status
-${data.currentStatus || "TBD"}.
-
-${data.limitations ? `Known limitations: ${data.limitations}` : "Known limitations: TBD"}
-
-## Judge Path
-${data.judgePath || "Open the live demo and inspect the primary flow first."}
-
-## Demo Gatekeeper Result
-Readiness score: ${results.score}%.
-
-${results.checks.map((check) => `- ${check.status.toUpperCase()}: ${check.title} - ${check.detail}`).join("\n")}
-`;
+Return:
+1. strongest recommendation
+2. top risks
+3. concrete next step
+4. vote: ship / revise / reject`
+    )
+    .join("\n\n");
 }
 
 function render() {
-  const data = getData();
-  const results = evaluate(data);
-  const markdown = packet(data, results);
+  const analysis = analyze();
+  const responses = agents.map((agent) => ({ agent, text: agentResponse(agent, analysis) }));
+  voteLabel.textContent = analysis.approved ? "Ship" : "Revise";
+  riskLabel.textContent = `${analysis.risks.length} risk${analysis.risks.length === 1 ? "" : "s"} found`;
 
-  scoreValue.textContent = `${results.score}%`;
-  scoreTone.textContent = results.score >= 90 ? "Submission ready" : results.score >= 70 ? "Nearly ready" : "Needs work";
-  sentenceCount.textContent = `${results.descriptionSentences} sentence${results.descriptionSentences === 1 ? "" : "s"}`;
-
-  checklist.innerHTML = results.checks
+  transcript.innerHTML = responses
     .map(
-      (check) => `
-        <article class="check ${check.status}">
-          <span class="check-icon">${labels[check.status]}</span>
+      ({ agent, text }) => `
+        <article class="agent-card ${agent.color}">
           <div>
-            <strong>${check.title}</strong>
-            <p>${check.detail}</p>
+            <span>${agent.focus}</span>
+            <strong>${agent.name}</strong>
           </div>
+          <p>${escaped(text)}</p>
         </article>
       `
     )
     .join("");
 
-  judgePreview.innerHTML = `
-    <article>
-      <h3>What judges should inspect first</h3>
-      <p>${data.judgePath || "Add a direct 2-minute judge path."}</p>
-    </article>
-    <article>
-      <h3>Build summary</h3>
-      <p>${data.projectDescription || "Add the 2-4 sentence project description."}</p>
-    </article>
-    <article>
-      <h3>Codex usage</h3>
-      <p>${data.codexUsage || "Add a specific Codex usage explanation."}</p>
-    </article>
-    <article>
-      <h3>Links</h3>
-      <p>Demo: ${data.demoUrl || "TBD"}</p>
-      <p>Repo/artifact: ${data.repoUrl || "TBD"}</p>
-    </article>
-  `;
+  promptPack.textContent = buildPromptPack();
+}
 
-  packetPreview.textContent = markdown;
+async function copyPrompts() {
+  await navigator.clipboard.writeText(promptPack.textContent);
 }
 
 function loadExample() {
-  for (const [key, value] of Object.entries(example)) {
-    const field = form.elements[key];
-    if (!field) continue;
-    if (key === "accessModel") {
-      const option = form.querySelector(`input[name="accessModel"][value="${value}"]`);
-      if (option) option.checked = true;
-    } else {
-      field.value = value;
-    }
-  }
+  goal.value = examples.goal;
+  constraints.value = examples.constraints;
+  assets.value = examples.assets;
+  timebox.value = "15 minutes";
+  outputFormat.value = "Working MVP";
   render();
 }
 
-async function copyPacket() {
-  const data = getData();
-  const markdown = packet(data, evaluate(data));
-  await navigator.clipboard.writeText(markdown);
-  copyButton.textContent = "Copied";
-  window.setTimeout(() => {
-    copyButton.textContent = "Copy packet";
-  }, 1200);
+function clearRoom() {
+  goal.value = "";
+  constraints.value = "";
+  assets.value = "";
+  render();
 }
-
-form.addEventListener("input", render);
-form.addEventListener("change", render);
-seedButton.addEventListener("click", loadExample);
-copyButton.addEventListener("click", copyPacket);
 
 loadExample();
