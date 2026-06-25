@@ -23,6 +23,8 @@ const checks = [
   ["app includes cross examination", files.js.includes("Cross-Examination")],
   ["app wires run court handler", files.js.includes('els.runButton.addEventListener("click", runCourt)')],
   ["app confirms court ran", files.js.includes("Court ran") && files.js.includes("Verdict refreshed")],
+  ["app handles no-login phrasing", files.js.includes("no[-\\s]?login")],
+  ["app penalizes judge blockers", files.js.includes("hasJudgeBlocker") && files.js.includes("riskPenalty")],
   ["app includes judge scorecard", files.js.includes("buildScorecard")],
   ["app includes conflict map", files.js.includes("buildConflicts")],
   ["app includes handoff queue", files.js.includes("buildHandoffs")],

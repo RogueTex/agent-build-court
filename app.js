@@ -104,7 +104,7 @@ function getBrief() {
 function buildRisks(brief) {
   const text = `${brief.mission} ${brief.constraints} ${brief.context} ${brief.winningBar}`;
   const risks = [];
-  if (includesAny(text, [/login/i, /sign in/i, /auth/i]) && !includesAny(text, [/no login/i, /no auth/i])) risks.push("auth friction");
+  if (includesAny(text, [/login/i, /sign in/i, /auth/i]) && !includesAny(text, [/no[-\s]?login/i, /no[-\s]?auth/i, /no sign[-\s]?in/i, /without logging in/i])) risks.push("auth friction");
   if (includesAny(text, [/backend/i, /server/i, /database/i, /api key/i]) && !includesAny(text, [/no backend/i, /static/i])) risks.push("backend dependency");
   if (includesAny(text, [/private/i, /request access/i, /invite/i]) && !includesAny(text, [/public/i, /no private/i])) risks.push("private access");
   if (includesAny(text, [/install/i, /clone/i, /run locally/i]) && !includesAny(text, [/no install/i, /browser/i])) risks.push("install friction");
@@ -113,20 +113,25 @@ function buildRisks(brief) {
   return risks;
 }
 
+function hasJudgeBlocker(risks) {
+  return risks.some((risk) => ["auth friction", "backend dependency", "private access", "install friction"].includes(risk));
+}
+
 function buildScorecard(brief, risks) {
   const text = `${brief.mission} ${brief.constraints} ${brief.context} ${brief.winningBar}`;
   return [
-    ["Public demo clarity", includesAny(text, [/public/i, /demo/i, /github pages/i, /no login/i])],
+    ["Public demo clarity", includesAny(text, [/public/i, /demo/i, /github pages/i, /no[-\s]?login/i]) && !hasJudgeBlocker(risks)],
     ["Codex usage visibility", includesAny(text, [/codex/i, /agent/i, /subagent/i, /committee/i])],
     ["Practical artifact", includesAny(text, [/packet/i, /mvp/i, /spec/i, /build/i, /artifact/i])],
-    ["Scope control", risks.length <= 2],
-    ["Judge-ready story", wordCount(brief.winningBar) >= 6],
+    ["Scope control", risks.length === 0],
+    ["Judge-ready story", wordCount(brief.winningBar) >= 6 && !hasJudgeBlocker(risks)],
   ].map(([label, passed]) => ({ label, passed, score: passed ? 20 : 0 }));
 }
 
 function buildVerdict(scorecard, risks) {
   const score = scorecard.reduce((sum, item) => sum + item.score, 0);
-  const confidence = Math.max(0, Math.min(100, score - Math.max(0, risks.length - 1) * 10));
+  const riskPenalty = risks.length * 5 + (hasJudgeBlocker(risks) ? 20 : 0);
+  const confidence = Math.max(0, Math.min(100, score - riskPenalty));
   return {
     label: confidence >= 80 ? "Ship" : confidence >= 50 ? "Revise" : "Reject",
     confidence,
