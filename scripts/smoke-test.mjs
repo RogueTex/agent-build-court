@@ -18,7 +18,8 @@ const checks = [
   ["app seeds a working example", files.js.includes("loadExample();")],
   ["styles include responsive rules", files.css.includes("@media (max-width: 900px)")],
   ["README documents status", files.readme.includes("Working static MVP")],
-  ["submission draft has placeholders", files.submission.includes("PUBLIC_DEMO_URL_HERE")],
+  ["submission draft has public demo URL", files.submission.includes("https://raghoo.me/demo-gatekeeper/")],
+  ["submission draft has public repo URL", files.submission.includes("https://github.com/RogueTex/demo-gatekeeper")],
 ];
 
 const failed = checks.filter(([, passed]) => !passed);

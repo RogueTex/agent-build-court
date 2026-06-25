@@ -10,11 +10,9 @@ Demo Gatekeeper is a no-login static submission readiness tool for Codex Hackath
 
 ## Links For Judges
 
-Replace these before submitting:
-
-1. Live demo: `PUBLIC_DEMO_URL_HERE`
-2. Repo/artifact: `PUBLIC_REPO_OR_ARTIFACT_URL_HERE`
-3. Screenshot/video/final output: `PUBLIC_BACKUP_URL_HERE`
+1. Live demo: https://raghoo.me/demo-gatekeeper/
+2. Repo/artifact: https://github.com/RogueTex/demo-gatekeeper
+3. Screenshot/video/final output: https://github.com/RogueTex/demo-gatekeeper/blob/main/docs/JUDGING.md
 
 ## How Did You Use Codex?
 
@@ -22,7 +20,7 @@ Codex helped interpret the submission form, run a two-agent grill/vote, compare 
 
 ## Current Status
 
-Working static MVP. The app has no backend, no login, no database, and no dependency install. Link checks are deterministic format and access-risk checks, not live network verification. It still needs deployment to a public static URL before final submission.
+Working static MVP. The app has no backend, no login, no database, and no dependency install. Link checks are deterministic format and access-risk checks, not live network verification. The GitHub Pages demo and public repo links are live.
 
 ## Consent Reminder
 

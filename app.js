@@ -12,9 +12,9 @@ const example = {
   projectTitle: "Demo Gatekeeper",
   projectDescription:
     "Demo Gatekeeper is a no-login submission readiness tool for Codex Hackathon builders. It checks whether a project has judge-accessible links, a clear 2-minute judge path, an honest status note, and a strong Codex usage explanation. Judges should first inspect the Gate Check score and the generated submission packet.",
-  demoUrl: "https://example.com/demo-gatekeeper",
-  repoUrl: "https://github.com/example/demo-gatekeeper",
-  backupUrl: "https://example.com/demo-gatekeeper-screenshot",
+  demoUrl: "https://raghoo.me/demo-gatekeeper/",
+  repoUrl: "https://github.com/RogueTex/demo-gatekeeper",
+  backupUrl: "https://github.com/RogueTex/demo-gatekeeper/blob/main/docs/JUDGING.md",
   codexUsage:
     "Codex helped run a two-agent grill session, compare candidate projects against the actual submission form, vote on the safest 30-minute MVP, create markdown run records, implement the static app, refine the UI, and prepare copy-ready submission text.",
   currentStatus: "Working MVP",

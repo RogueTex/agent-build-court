@@ -4,7 +4,9 @@ Demo Gatekeeper is a no-login static MVP for Codex Hackathon builders. It helps 
 
 ## Demo
 
-Public demo URL: `PUBLIC_DEMO_URL_HERE`
+Public demo URL: https://raghoo.me/demo-gatekeeper/
+
+Repository URL: https://github.com/RogueTex/demo-gatekeeper
 
 ## Why This Project
 
@@ -41,7 +43,8 @@ Then open `http://127.0.0.1:4173`.
 - `docs/runs/run-03-chair-vote.md` - final MVP spec
 - `docs/runs/run-04-verification.md` - local verification record
 - `docs/runs/run-05-repo-grill.md` - final repo acceptance vote
-- `SUBMISSION_DRAFT.md` - copy-ready form draft with URL placeholders
+- `docs/runs/run-06-deployment.md` - public GitHub Pages deployment check
+- `SUBMISSION_DRAFT.md` - copy-ready form draft with public links
 
 ## Local Preview
 
