@@ -42,6 +42,19 @@ const example = {
   artifact: "Working MVP",
 };
 
+const riskyExample = {
+  mission:
+    "Build a daily briefing tool that connects to Gmail and Google Calendar, summarizes urgent messages and meetings, and gives the user a morning action plan.",
+  constraints:
+    "Requires user login, Gmail API, Calendar API, database storage, and access to private account data. Must ship in 30 minutes and still be judge-accessible.",
+  context:
+    "The team has a static repo and Codex, but no OAuth setup, no verified Google app, no backend, and no safe sample account for judges.",
+  winningBar:
+    "A judge immediately sees why the idea should be revised into a no-login mock or build packet before implementation.",
+  timebox: "30 minutes",
+  artifact: "Pull request plan",
+};
+
 const fields = {
   mission: document.querySelector("#mission"),
   constraints: document.querySelector("#constraints"),
@@ -65,6 +78,7 @@ const els = {
 };
 
 document.querySelector("#loadExample").addEventListener("click", loadExample);
+document.querySelector("#loadRiskyExample").addEventListener("click", loadRiskyExample);
 els.runButton.addEventListener("click", runCourt);
 document.querySelector("#copyPacket").addEventListener("click", copyPacket);
 document.querySelector("#downloadMarkdown").addEventListener("click", downloadMarkdown);
@@ -337,7 +351,15 @@ function downloadJson() {
 }
 
 function loadExample() {
-  for (const [key, value] of Object.entries(example)) {
+  loadBrief(example);
+}
+
+function loadRiskyExample() {
+  loadBrief(riskyExample);
+}
+
+function loadBrief(brief) {
+  for (const [key, value] of Object.entries(brief)) {
     fields[key].value = value;
   }
   render();

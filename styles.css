@@ -169,6 +169,13 @@ h3 {
   margin-top: 18px;
 }
 
+.heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .editor-panel,
 .output-panel {
   display: grid;
